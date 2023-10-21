@@ -1,2 +1,7 @@
 # Roboworks
-AI assistant that chats with you in Geometry Dash, wtf
+## Folders
+```
+cloudflare-workers - AI for Cloudflare Workers
+geometry-dash - Geometry Dash bot (WIP)
+php-api - API for your website.
+```

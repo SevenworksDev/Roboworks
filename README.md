@@ -12,6 +12,6 @@ Create a cloudflare worker with the `@cf/meta/llama-2-7b-chat-int8` AI model on 
 ## Setup php-api (optional, but lets be real plaintext apis are the bomb) (dont read readmes on planes)
 Upload the api.php file on your webhost or selfhost it through Cloudflare Tunnels and change the link in the PHP file to your Cloudflare Worker URL.
 ## Setup geometry-dash
-Edit the config part of main.py and install Python 3.8 if requests module doesnt work correctly and install requests==2.12.0 through pip. 
+Edit the config part of main.py and install Python 3.8 and install emoji==1.5 through pip. if requests module doesnt work correctly then install requests==2.12.0 through pip. 
 ## Setup website
 Same as php-api instructions but upload index.html or selfhost it.

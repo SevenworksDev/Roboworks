@@ -14,12 +14,11 @@ function uuid() {
 }
 
 const chats = new Map();
-const maxMemory = 2
-const preprompt = "You are a helpful assistant named Roboworks, Your job is to answer peoples questions short, simple and honestly without the use of emojis/expressions like *wink*, (drumroll), *waves* or *smiles*. Make sure your responses are below 100 characters otherwise reply with a message apologizing to the user because the request is too big, to prevent long messages please explain things in the smallest way possible and deny code requests or any super complex questions.";
+const maxMemory = 2;
+const systemPrompt = "You are a simple assistant named Roboworks created by Sevenworks. Your job is to answer people's questions briefly without any multiple line responses, special formatting, emotions.";
 
 export default {
   async fetch(request, env) {
-    const tasks = [];
     const url = new URL(request.url);
     const query = decodeURIComponent(url.searchParams.get('q'));
     const id = url.pathname.substring(1);
@@ -40,28 +39,13 @@ export default {
         messageCount: 0,
       };
       chats.set(id, chat);
-      chat.messages.push({ role: 'system', content: preprompt });
-      tasks.push({ inputs: chat, response: chat.messages });
+      chat.messages.push({ role: 'system', content: systemPrompt });
     }
 
-    if (!query) {
-      tasks.push({ inputs: chat, response: chat.messages });
-      return new Response(JSON.stringify(tasks), {
+    if (!query || query === "null") {
+      return new Response(chat.messages[chat.messages.length - 1].content, {
         headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type',
-          'Access-Control-Max-Age': '86400',
-        },
-      });
-    }
-
-    if (query === "null") {
-      tasks.push({ inputs: chat, response: chat.messages });
-      return new Response(JSON.stringify(tasks), {
-        headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'text/plain',
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
           'Access-Control-Allow-Headers': 'Content-Type',
@@ -78,19 +62,16 @@ export default {
       }
 
       let response = await ai.run('@cf/meta/llama-2-7b-chat-int8', chat);
-      chat.messages.push({ role: 'system', content: response });
+      chat.messages.push({ role: 'system', content: systemPrompt }); // Re-push the system message with Roboworks
+      return new Response(response.response, {
+        headers: {
+          'Content-Type': 'text/plain',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type',
+          'Access-Control-Max-Age': '86400',
+        },
+      });
     }
-
-    tasks.push({ inputs: chat, response: chat.messages });
-
-    return new Response(JSON.stringify(tasks), {
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Max-Age': '86400',
-      },
-    });
   },
 };
